@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: NPR Story API
+ * Plugin Name: NPR Story API - WAMU Fork
  * Description: A collection of tools for reusing content from NPR.org supplied by Digital Services.
- * Version: 1.6
+ * Version: 9.9
  * Author: NPR Digital Services
  * License: GPLv2
 */
@@ -140,7 +140,7 @@ function nprstory_show_message( $message, $errormsg = false ) {
 	echo "<p><strong>$message</strong></p></div>";
 }
 
-add_action( 'init', 'nprstory_create_post_type' );
+//add_action( 'init', 'nprstory_create_post_type' );
 
 function nprstory_create_post_type() {
 	register_post_type( NPR_POST_TYPE,

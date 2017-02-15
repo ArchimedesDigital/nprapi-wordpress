@@ -48,6 +48,11 @@ function nprstory_post_to_nprml_story( $post ) {
     	}
     } else {
 	    $content = $post->post_content;
+
+        if( function_exists('wamu_markdown_transform')) {
+            $content = wamu_markdown_transform($content);
+        }
+
 	    if ( empty( $teaser_text ) ) {
 		    $teaser_text = nprstory_nai_get_excerpt( $post );
 	    }
@@ -88,52 +93,57 @@ function nprstory_post_to_nprml_story( $post ) {
      *If no cool things are going on, just send the display name for the post_author field.
      *
      */
-    $byline = FALSE;
-    $custom_byline_meta = get_option( 'ds_npr_api_mapping_byline' );
-    if ($use_custom && ! empty( $custom_byline_meta ) && $custom_byline_meta != '#NONE#' && in_array( $custom_content_meta,$post_metas ) ) {
-        $byline = TRUE;
-    	$story[] = array(
-	        'tag' => 'byline',
-            'children' => array(
-                array(
-                    'tag' => 'name',
-                    'text' => get_post_meta( $post->ID, $custom_byline_meta, true ),
-                )
-            ),
-	   );
-    }
-    if ( function_exists( 'get_coauthors' ) ) {
-        $coauthors = get_coauthors( $post->ID );
-        if ( ! empty( $coauthors ) ) {
-            $byline = TRUE;		
-            foreach( $coauthors as $i=>$co ) {
-                $story[] = array(
-                    'tag' => 'byline',
-                    'children' => array(
-                        array(
-                            'tag' => 'name',
-                            'text' => $co->display_name,
-                        )
-                    )
-                );
-            }		
-        } else {
-            nprstory_error_log( 'we do not have co authors' );
-    	}
-    } else {
-   		nprstory_error_log('can not find get_coauthors');
-   	}    
-    if ( ! $byline ) {
-        $story[] = array(
-            'tag' => 'byline',
-            'children' => array (
-                array(
-                    'tag' => 'name',
-                    'text' => get_the_author_meta( 'display_name', $post->post_author ),
-				)
-            ),			
-        );
-    }
+
+    /** WAMU do not use byline **/
+
+    // $byline = FALSE;
+    // $custom_byline_meta = get_option( 'ds_npr_api_mapping_byline' );
+    // if ($use_custom && ! empty( $custom_byline_meta ) && $custom_byline_meta != '#NONE#' && in_array( $custom_content_meta,$post_metas ) ) {
+    //     $byline = TRUE;
+    // 	$story[] = array(
+	   //      'tag' => 'byline',
+    //         'children' => array(
+    //             array(
+    //                 'tag' => 'name',
+    //                 'text' => get_post_meta( $post->ID, $custom_byline_meta, true ),
+    //             )
+    //         ),
+	   // );
+    // }
+
+
+    // if ( function_exists( 'get_coauthors' ) ) {
+    //     $coauthors = get_coauthors( $post->ID );
+    //     if ( ! empty( $coauthors ) ) {
+    //         $byline = TRUE;		
+    //         foreach( $coauthors as $i=>$co ) {
+    //             $story[] = array(
+    //                 'tag' => 'byline',
+    //                 'children' => array(
+    //                     array(
+    //                         'tag' => 'name',
+    //                         'text' => $co->display_name,
+    //                     )
+    //                 )
+    //             );
+    //         }		
+    //     } else {
+    //         nprstory_error_log( 'we do not have co authors' );
+    // 	}
+    // } else {
+   	// 	nprstory_error_log('can not find get_coauthors');
+   	// }    
+    // if ( ! $byline ) {
+    //     $story[] = array(
+    //         'tag' => 'byline',
+    //         'children' => array (
+    //             array(
+    //                 'tag' => 'name',
+    //                 'text' => get_the_author_meta( 'display_name', $post->post_author ),
+				// )
+    //         ),			
+    //     );
+    // }
 
     // NPR One
 	// If the box is checked, the value here is '1'
@@ -146,13 +156,18 @@ function nprstory_post_to_nprml_story( $post ) {
 
     #'miniTeaser' => array( 'text' => '' ),
     #'slug' => array( 'text' => '' ),
+    
+   
+
+    $starting_time = strtotime(get_post_meta( $post->ID, 'starting_time', true ));
+
     $story[] = array(
         'tag' => 'storyDate',
-        'text' => mysql2date( 'D, d M Y H:i:s +0000', $post->post_date_gmt ),
+        'text' => gmdate('D, d M Y H:i:s O', $starting_time),
     );
     $story[] = array(
         'tag' => 'pubDate',
-        'text' => mysql2date( 'D, d M Y H:i:s +0000', $post->post_modified_gmt ),
+        'text' => mysql2date( 'D, d M Y H:i:s +0000', $post->post_date_gmt ),
     );
     $story[] = array(
         'tag' => 'lastModifiedDate',
@@ -200,7 +215,7 @@ function nprstory_post_to_nprml_story( $post ) {
     );
 
     $images = get_children( $args );
-    $primary_image = get_post_thumbnail_id( $post->ID );
+    $primary_image = get_post_thumbnail_id( $post->ID, 'full' );
 			
     foreach ( $images as $image ) {
         $custom_credit = '';
@@ -226,16 +241,16 @@ function nprstory_post_to_nprml_story( $post ) {
 			
         //is the image in the content?  If so, tell the APi with a flag that CorePublisher knows
         //WP may add something like "-150X150" to the end of the filename, before the extension.  Isn't that nice?
-        $image_name_parts = split( ".", $image_guid );
-        $image_regex = "/" . $image_name_parts[0] . "\-[a-zA-Z0-9]*" . $image_name_parts[1] . "/"; 
-        $in_body = "";
-        if ( preg_match( $image_regex, $content ) ) {
-				if ( strstr( $image->guid, '?') ) {
-					$in_body = "&origin=body";
-				} else {
-					$in_body = "?origin=body";
-				}
-        }
+    //     $image_name_parts = split( ".", $image_guid );
+    //     $image_regex = "/" . $image_name_parts[0] . "\-[a-zA-Z0-9]*" . $image_name_parts[1] . "/"; 
+    //     $in_body = "";
+    //     if ( preg_match( $image_regex, $content ) ) {
+				// if ( strstr( $image->guid, '?') ) {
+				// 	$in_body = "&origin=body";
+				// } else {
+				// 	$in_body = "?origin=body";
+				// }
+    //     }
         $story[] = array( 
             'tag' => 'image',
             'attr' => array( 'src' => $image->guid . $in_body, 'type' => $image_type ), 
@@ -260,24 +275,55 @@ function nprstory_post_to_nprml_story( $post ) {
         );
     }
 			
-    //should be able to do the same as image for audio, with post_mime_typ = 'audio' or something.
-    $args = array(
-        'order'=> 'DESC',
-        'post_mime_type' => 'audio',
-        'post_parent' => $post->ID,
-        'post_status' => null,
-        'post_type' => 'attachment'
-    );		
-    $audios = get_children( $args );
+    // //should be able to do the same as image for audio, with post_mime_type = 'audio' or something.
+    // $args = array(
+    //     'order'=> 'DESC',
+    //     'post_mime_type' => 'audio',
+    //     'post_parent' => $post->ID,
+    //     'post_status' => null,
+    //     'post_type' => 'attachment'
+    // );		
+    // $audios = get_children( $args );
 			
-    foreach ( $audios as $audio ) {
-        $audio_meta = wp_get_attachment_metadata( $audio->ID );
-        $caption = $audio->post_excerpt;
-        //if we don't have excerpt filled in, try content
-        if ( empty( $caption ) ) {
-            $caption = $audio->post_content;
-        }
+    // foreach ( $audios as $audio ) {
+    //     $audio_meta = wp_get_attachment_metadata( $audio->ID );
+    //     $caption = $audio->post_excerpt;
+    //     //if we don't have excerpt filled in, try content
+    //     if ( empty( $caption ) ) {
+    //         $caption = $audio->post_content;
+    //     }
 			
+    //     $story[] = array(
+    //         'tag' => 'audio',
+    //         'children' => array(
+    //             array(
+    //                 'tag' => 'format',
+    //                 'children' => array (
+    //                     array(
+    //         	           'tag' => 'mp3',
+    //                         'text' => $audio->guid,
+    //                     )
+    //                 ),
+    //             ),
+    //             array(
+    //                 'tag' => 'description',
+    //                 'text' => $caption,
+    //             ),
+    //             array(
+    //                 'tag' => 'duration',
+    //                 'text' => $audio_meta['length'],
+    //             ),
+    //         ),
+    //     );				
+    // }
+
+    $audio_file = get_post_meta( $post->ID, 'audio_file', true );
+    $audio_duration = get_post_meta( $post->ID, '_audio_file_duration', true );
+
+    if (! empty( $audio_file )) {
+
+        $audio = wamuSite::globals()->audio_archive_mp3_path_ssl . $audio_file . '.mp3';
+
         $story[] = array(
             'tag' => 'audio',
             'children' => array(
@@ -285,21 +331,18 @@ function nprstory_post_to_nprml_story( $post ) {
                     'tag' => 'format',
                     'children' => array (
                         array(
-            	           'tag' => 'mp3',
-                            'text' => $audio->guid,
+                        'tag' => 'mp3',
+                            'text' => $audio,
                         )
                     ),
                 ),
                 array(
-                    'tag' => 'description',
-                    'text' => $caption,
-                ),
-                array(
                     'tag' => 'duration',
-                    'text' => $audio_meta['length'],
+                    'text' => strlen($audio_duration) > 0 ? $audio_duration : '2880',
                 ),
             ),
-        );				
+        );   
+
     }
 
     if ( $enclosures = get_metadata( 'post', $post->ID, 'enclosure' ) ) {
