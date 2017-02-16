@@ -10,6 +10,19 @@ require_once ( NPRSTORY_PLUGIN_DIR . 'classes/NPRAPIWordpress.php' );
  * @param unknown_type $post_ID
  * @param unknown_type $post
  */
+
+function nprstory_wamu_api_push_update( $post_ID, $post ) {
+	$story_id = get_post_meta( $post_ID, NPR_STORY_ID_META_KEY, true);
+
+	if(empty($story_id)){
+		return;
+	}
+
+	nprstory_api_push ( $post_ID, $post );
+
+}
+
+
 function nprstory_api_push ( $post_ID, $post ) {
 	if ( ! current_user_can( 'publish_posts' ) ) {
 		wp_die(
@@ -123,6 +136,9 @@ if ( isset( $_POST['ds_npr_update_push'] ) ) {
 add_action( 'trash_post', 'nprstory_api_delete', 10, 2 );
 //this may need to check version and use 'wp_trash_post'
 add_action( 'wp_trash_post', 'nprstory_api_delete', 10, 2 );
+
+add_action( 'save_post', 'nprstory_wamu_api_push_update', 10, 2 );
+
 
 /**
  *
