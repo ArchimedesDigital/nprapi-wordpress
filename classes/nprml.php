@@ -167,7 +167,7 @@ function nprstory_post_to_nprml_story( $post ) {
     );
     $story[] = array(
         'tag' => 'pubDate',
-        'text' => mysql2date( 'D, d M Y H:i:s +0000', $post->post_date_gmt ),
+        'text' => mysql2date( 'D, d M Y H:i:s +0000', $post->post_modified_gmt ),
     );
     $story[] = array(
         'tag' => 'lastModifiedDate',
