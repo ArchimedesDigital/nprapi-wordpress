@@ -160,7 +160,7 @@ function nprstory_create_post_type() {
 function nprstory_add_meta_boxes() {
 
 	$screen = get_current_screen();
-	$push_post_type = get_option( 'ds_npr_push_post_type' ) ?: 'post';
+	$push_post_type = nprstory_get_push_post_type();
 	$push_url = get_option( 'ds_npr_api_push_url' );
 	if ( $screen->id == $push_post_type && ! empty( $push_url ) ) {
 		global $post;

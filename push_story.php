@@ -96,9 +96,9 @@ function nprstory_api_delete ( $post_ID ) {
 	$push_url = get_option( 'ds_npr_api_push_url' );
 	if ( $post->post_type == $push_post_type && ! empty( $push_url ) && ! empty( $api_id ) ) {
 		// For now, only submit regular posts, and only on publish.
-		if ( $post->post_type != 'post' || $post->post_status != 'publish' ) {
-			return;
-		}
+		// if ( $post->post_type != 'post' || $post->post_status != 'publish' ) {
+		// 	return;
+		// }
 		$api = new NPRAPIWordpress();
 		$retrieved = get_post_meta( $post_ID, NPR_RETRIEVED_STORY_META_KEY, true );
 
