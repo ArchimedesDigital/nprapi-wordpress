@@ -53,6 +53,24 @@ function nprstory_post_to_nprml_story( $post ) {
             $content = wamu_markdown_transform($content);
         }
 
+        if ( function_exists('wamu_get_guests') ) {
+            $guests = wamu_get_guests($post->ID);
+
+            if ( count($guests) > 0 ) {
+                $content .= '<p><h4>Guests</h4></p>';
+            }
+
+            foreach ( $guests as $guest ) {
+                $content .= '<p><strong>' . $guest['name'] . '</strong>, ' . $guest['credentials'] . '</p>';
+                
+            }
+        }
+
+        // Add attribution
+        $content .= '<p>&copy; ' . substr(get_post_meta($post->ID, 'starting_time', true), 0, 4 ) . ' WAMU 88.5 - American University Radio. ';
+        $content .= 'For more, see <a href="' . get_permalink( $post ) . '">' . get_permalink( $post ) . '</a></p>';
+
+
 	    if ( empty( $teaser_text ) ) {
 		    $teaser_text = nprstory_nai_get_excerpt( $post );
 	    }
