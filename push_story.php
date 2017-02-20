@@ -24,13 +24,13 @@ function nprstory_wamu_api_push_update( $post_ID, $post ) {
 
 
 function nprstory_api_push ( $post_ID, $post ) {
-	if ( ! current_user_can( 'publish_posts' ) ) {
-		wp_die(
-			__('You do not have permission to publish posts, and therefore you do not have permission to push posts to the NPR API.'),
-			__('NPR Story API Error'),
-			403
-		);
-	}
+	// if ( ! current_user_can( 'publish_posts' ) ) {
+	// 	wp_die(
+	// 		__('You do not have permission to publish posts, and therefore you do not have permission to push posts to the NPR API.'),
+	// 		__('NPR Story API Error'),
+	// 		403
+	// 	);
+	// }
 
 	$push_post_type = get_option( 'ds_npr_push_post_type' );
 	if ( empty( $push_post_type ) ) {
