@@ -29,7 +29,26 @@ function nprstory_post_to_nprml_story( $post ) {
         'text' => get_permalink( $post ),
     );
     $use_custom = get_option( 'dp_npr_push_use_custom_map' );
+    $program_id = get_option('ds_npr_api_program_id');
     
+    if ( ! empty($program_id )){
+        $story[] = array(
+            'tag' => 'parent',
+            'attr' => array( 'type' => 'program', 'id' => $program_id),
+            'children' => array(
+                array(
+                    'tag' => 'title',
+                    'text' => get_bloginfo()
+                ),
+                array(
+                    'tag' => 'link',
+                    'text' => get_option('siteurl')
+                )
+            )
+        );
+    }
+
+
     //get the list of metas available for this post
     $post_metas = get_post_custom_keys( $post->ID );
     

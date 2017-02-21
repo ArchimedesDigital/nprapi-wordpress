@@ -53,6 +53,9 @@ function nprstory_settings_init() {
     add_settings_field( 'ds_npr_api_org_id', 'Org ID', 'nprstory_api_org_id_callback', 'ds_npr_api', 'ds_npr_api_settings' );
     register_setting( 'ds_npr_api', 'ds_npr_api_org_id', 'nprstory_validation_callback_api_key' );
 
+    add_settings_field( 'ds_npr_api_program_id', 'Program ID', 'nprstory_api_program_id_callback', 'ds_npr_api', 'ds_npr_api_settings' );
+    register_setting( 'ds_npr_api', 'ds_npr_api_program_id', 'nprstory_validation_callback_api_key' );
+
     add_settings_section( 'ds_npr_api_get_multi_settings', 'NPR API multiple get settings', 'nprstory_api_get_multi_settings_callback', 'ds_npr_api_get_multi_settings' );
 
     add_settings_field( 'ds_npr_num', 'Number of things to get', 'nprstory_api_num_multi_callback', 'ds_npr_api_get_multi_settings', 'ds_npr_api_get_multi_settings' );
@@ -213,6 +216,12 @@ function nprstory_api_org_id_callback() {
     $option = get_option( 'ds_npr_api_org_id' );
     echo "<input type='text' value='$option' name='ds_npr_api_org_id' style='width: 300px;' />";
 	wp_nonce_field( 'nprstory_nonce_ds_npr_api_org_id', 'nprstory_nonce_ds_npr_api_org_id_name', true, true );
+}
+
+function nprstory_api_program_id_callback() {
+    $option = get_option( 'ds_npr_api_program_id' );
+    echo "<input type='text' value='$option' name='ds_npr_api_program_id' style='width: 300px;' />";
+	wp_nonce_field( 'nprstory_nonce_ds_npr_api_program_id', 'nprstory_nonce_ds_npr_api_program_id_name', true, true );
 }
 
 function nprstory_pull_post_type_callback() {
