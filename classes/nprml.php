@@ -202,7 +202,7 @@ function nprstory_post_to_nprml_story( $post ) {
     );
     $story[] = array(
         'tag' => 'partnerId',
-        'text' => $post->guid,
+        'text' => get_permalink($post->ID),
     );
     //TODO:  When the API accepts sending both text and textWithHTML, send a totally bare text.  Don't do do_shortcode(). 
     //for now (using the npr story api) we can either send text or textWithHTML, not both.

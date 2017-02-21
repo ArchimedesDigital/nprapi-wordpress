@@ -154,7 +154,7 @@ class DS_NPR_API {
     }
 
     function admin_menu() {
-        add_posts_page( 'Get NPR DS Stories', 'Get NPR Stories', 'edit_posts', 'get-npr-stories',   'nprstory_get_stories' );
+        //add_posts_page( 'Get NPR DS Stories', 'Get NPR Stories', 'edit_posts', 'get-npr-stories',   'nprstory_get_stories' );
     }
 
 }
