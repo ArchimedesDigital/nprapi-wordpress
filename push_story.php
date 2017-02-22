@@ -11,16 +11,16 @@ require_once ( NPRSTORY_PLUGIN_DIR . 'classes/NPRAPIWordpress.php' );
  * @param unknown_type $post
  */
 
-function nprstory_wamu_api_push_update( $post_ID, $post ) {
-	$story_id = get_post_meta( $post_ID, NPR_STORY_ID_META_KEY, true);
+// function nprstory_wamu_api_push_update( $post_ID, $post ) {
+// 	$story_id = get_post_meta( $post_ID, NPR_STORY_ID_META_KEY, true);
 
-	if(empty($story_id)){
-		return;
-	}
+// 	if(empty($story_id)){
+// 		return;
+// 	}
 
-	nprstory_api_push ( $post_ID, $post );
+// 	nprstory_api_push ( $post_ID, $post );
 
-}
+// }
 
 
 function nprstory_api_push ( $post_ID, $post ) {
@@ -137,7 +137,7 @@ add_action( 'trash_post', 'nprstory_api_delete', 10, 2 );
 //this may need to check version and use 'wp_trash_post'
 add_action( 'wp_trash_post', 'nprstory_api_delete', 10, 2 );
 
-add_action( 'save_post', 'nprstory_wamu_api_push_update', 10, 2 );
+//add_action( 'save_post', 'nprstory_wamu_api_push_update', 10, 2 );
 
 
 /**
@@ -524,7 +524,7 @@ function nprstory_bulk_action_push_action() {
             foreach( $post_ids as $post_id ) {
                 $api_id = get_post_meta( $post_id, NPR_STORY_ID_META_KEY, TRUE );
                 //if this story doesn't have an API ID, push it to the API.
-                if ( empty( $api_id ) && $exported < 20 ) {
+                if ( $exported < 20 ) {
                     $post = get_post( $post_id );
                     nprstory_api_push( $post_id, $post );
                     $exported ++;

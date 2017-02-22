@@ -1,5 +1,8 @@
 <?php
 
+date_default_timezone_set('America/New_York');
+
+
 /**
  * nprstory_to_nprml(): Translates a post to NPRML.  Returns an XML string.
  */
@@ -51,6 +54,8 @@ function nprstory_post_to_nprml_story( $post ) {
     
     if ( ! empty($program_id) ){
         $name = get_bloginfo();
+
+        $the_post_id = $post->ID;
         
         // Fetch all segments for show date and get order of each segment
         $today = date("Ymd", $starting_time);
@@ -73,9 +78,8 @@ function nprstory_post_to_nprml_story( $post ) {
 
         $segment_number = array_filter(
             $segments,
-            function ($e) {
-                global $post;
-                return $e->ID == $post->ID;
+            function ($e) use($the_post_id){
+                return $e->ID == $the_post_id;
             }
         );
 
@@ -141,9 +145,6 @@ function nprstory_post_to_nprml_story( $post ) {
             $content = wamu_markdown_transform($content);
         }
 
-
-        //error_log(wamu_get_guests($post->ID));
-
         if ( function_exists('wamu_get_guests') ) {
             
             $guests = wamu_get_guests($post->ID);
@@ -197,66 +198,6 @@ function nprstory_post_to_nprml_story( $post ) {
             'text' => $post->post_title,
         );
     }
-    
-    /**
-     * 
-     *If there is a custom byline configured, send that.
-     *If the site is using the coauthurs plugin, and get_coauthors exists, send the display names
-     *
-     *If no cool things are going on, just send the display name for the post_author field.
-     *
-     */
-
-    /** WAMU do not use byline **/
-
-    // $byline = FALSE;
-    // $custom_byline_meta = get_option( 'ds_npr_api_mapping_byline' );
-    // if ($use_custom && ! empty( $custom_byline_meta ) && $custom_byline_meta != '#NONE#' && in_array( $custom_content_meta,$post_metas ) ) {
-    //     $byline = TRUE;
-    //  $story[] = array(
-       //      'tag' => 'byline',
-    //         'children' => array(
-    //             array(
-    //                 'tag' => 'name',
-    //                 'text' => get_post_meta( $post->ID, $custom_byline_meta, true ),
-    //             )
-    //         ),
-       // );
-    // }
-
-
-    // if ( function_exists( 'get_coauthors' ) ) {
-    //     $coauthors = get_coauthors( $post->ID );
-    //     if ( ! empty( $coauthors ) ) {
-    //         $byline = TRUE;      
-    //         foreach( $coauthors as $i=>$co ) {
-    //             $story[] = array(
-    //                 'tag' => 'byline',
-    //                 'children' => array(
-    //                     array(
-    //                         'tag' => 'name',
-    //                         'text' => $co->display_name,
-    //                     )
-    //                 )
-    //             );
-    //         }        
-    //     } else {
-    //         nprstory_error_log( 'we do not have co authors' );
-    //  }
-    // } else {
-    //  nprstory_error_log('can not find get_coauthors');
-    // }    
-    // if ( ! $byline ) {
-    //     $story[] = array(
-    //         'tag' => 'byline',
-    //         'children' => array (
-    //             array(
-    //                 'tag' => 'name',
-    //                 'text' => get_the_author_meta( 'display_name', $post->post_author ),
-                // )
-    //         ),           
-    //     );
-    // }
 
     // NPR One
     // If the box is checked, the value here is '1'
@@ -323,43 +264,16 @@ function nprstory_post_to_nprml_story( $post ) {
         'post_type' => 'attachment'
     );
 
-    $images = get_children( $args );
-    $primary_image = get_post_thumbnail_id( $post->ID, 'full' );
+    //$images = get_children( $args );
+    $images = array(get_post(get_post_thumbnail_id( $post->ID, 'full' )));
             
     foreach ( $images as $image ) {
         $custom_credit = '';
         $custom_agency = '';
-        $image_metas = get_post_custom_keys( $image->ID );
-        if ( $use_custom && !empty( $custom_media_credit ) && $custom_media_credit != '#NONE#' && in_array( $custom_media_credit,$image_metas ) ) {
-            $custom_credit = get_post_meta( $image->ID, $custom_media_credit, true );
-        }
-        if ( $use_custom && ! empty( $custom_media_agency ) && $custom_media_agency != '#NONE#' && in_array( $custom_media_agency,$image_metas ) ) {
-            $custom_agency = get_post_meta( $image->ID, $custom_media_agency, true);
-        }
-        
-        if ( $use_custom && !empty( $dist_media_option ) && $dist_media_option != '#NONE#' && in_array( $dist_media_option,$image_metas ) ) {
-            $dist_media = get_post_meta( $image->ID, $dist_media_option, true );
-        }
+        //$image_metas = get_post_custom_keys( $image->ID );
+        $custom_credit = get_post_meta($image->ID, 'credit', true);
+        $image_type = 'primary';
 
-        //if the image field for distribute is set and polarity then send it.
-        //all kinds of other math when polarity is negative or the field isn't set.
-        $image_type = 'standard';
-        if ( $image->ID == $primary_image ) {
-            $image_type = 'primary';
-        }
-            
-        //is the image in the content?  If so, tell the APi with a flag that CorePublisher knows
-        //WP may add something like "-150X150" to the end of the filename, before the extension.  Isn't that nice?
-    //     $image_name_parts = split( ".", $image_guid );
-    //     $image_regex = "/" . $image_name_parts[0] . "\-[a-zA-Z0-9]*" . $image_name_parts[1] . "/"; 
-    //     $in_body = "";
-    //     if ( preg_match( $image_regex, $content ) ) {
-                // if ( strstr( $image->guid, '?') ) {
-                //  $in_body = "&origin=body";
-                // } else {
-                //  $in_body = "?origin=body";
-                // }
-    //     }
         $story[] = array( 
             'tag' => 'image',
             'attr' => array( 'src' => wamu_cdn_dirty_rewrite($image->guid) . $in_body, 'type' => $image_type ), 
@@ -383,48 +297,6 @@ function nprstory_post_to_nprml_story( $post ) {
             ),
         );
     }
-            
-    // //should be able to do the same as image for audio, with post_mime_type = 'audio' or something.
-    // $args = array(
-    //     'order'=> 'DESC',
-    //     'post_mime_type' => 'audio',
-    //     'post_parent' => $post->ID,
-    //     'post_status' => null,
-    //     'post_type' => 'attachment'
-    // );       
-    // $audios = get_children( $args );
-            
-    // foreach ( $audios as $audio ) {
-    //     $audio_meta = wp_get_attachment_metadata( $audio->ID );
-    //     $caption = $audio->post_excerpt;
-    //     //if we don't have excerpt filled in, try content
-    //     if ( empty( $caption ) ) {
-    //         $caption = $audio->post_content;
-    //     }
-            
-    //     $story[] = array(
-    //         'tag' => 'audio',
-    //         'children' => array(
-    //             array(
-    //                 'tag' => 'format',
-    //                 'children' => array (
-    //                     array(
-    //                     'tag' => 'mp3',
-    //                         'text' => $audio->guid,
-    //                     )
-    //                 ),
-    //             ),
-    //             array(
-    //                 'tag' => 'description',
-    //                 'text' => $caption,
-    //             ),
-    //             array(
-    //                 'tag' => 'duration',
-    //                 'text' => $audio_meta['length'],
-    //             ),
-    //         ),
-    //     );               
-    // }
 
     $audio_file = get_post_meta( $post->ID, 'audio_file', true );
     $audio_duration = get_post_meta( $post->ID, '_audio_file_duration', true );
@@ -454,37 +326,37 @@ function nprstory_post_to_nprml_story( $post ) {
 
     }
 
-    if ( $enclosures = get_metadata( 'post', $post->ID, 'enclosure' ) ) {
+    // if ( $enclosures = get_metadata( 'post', $post->ID, 'enclosure' ) ) {
 
-        // This logic is specifically driven by enclosure metadata items that are
-        // created by the PowerPress podcasting plug-in. It will likely have to be
-        // re-worked if we need to accomodate other plug-ins that use enclosures.
-        foreach( $enclosures as $enclosure ) {
-            $pieces = explode( "\n", $enclosure );
-            if ( !empty( $pieces[3] ) ) {
-                $metadata = unserialize( $pieces[3] );
-                $duration = ( ! empty($metadata['duration'] ) ) ? nprstory_convert_duration_to_seconds( $metadata['duration'] ) : NULL;
-            }
-            $story[] = array(
-                'tag' => 'audio',
-                'children' => array(
-                    array(
-                        'tag' => 'duration',
-                        'text' => ( !empty($duration) ) ? $duration : 0,
-                    ),
-                    array(
-                        'tag' => 'format',
-                        'children' => array(
-                            array(
-                            'tag' => 'mp3',
-                            'text' => $pieces[0],
-                            ),
-                        ),
-                    ),
-                ),
-            );
-        }
-    }
+    //     // This logic is specifically driven by enclosure metadata items that are
+    //     // created by the PowerPress podcasting plug-in. It will likely have to be
+    //     // re-worked if we need to accomodate other plug-ins that use enclosures.
+    //     foreach( $enclosures as $enclosure ) {
+    //         $pieces = explode( "\n", $enclosure );
+    //         if ( !empty( $pieces[3] ) ) {
+    //             $metadata = unserialize( $pieces[3] );
+    //             $duration = ( ! empty($metadata['duration'] ) ) ? nprstory_convert_duration_to_seconds( $metadata['duration'] ) : NULL;
+    //         }
+    //         $story[] = array(
+    //             'tag' => 'audio',
+    //             'children' => array(
+    //                 array(
+    //                     'tag' => 'duration',
+    //                     'text' => ( !empty($duration) ) ? $duration : 0,
+    //                 ),
+    //                 array(
+    //                     'tag' => 'format',
+    //                     'children' => array(
+    //                         array(
+    //                         'tag' => 'mp3',
+    //                         'text' => $pieces[0],
+    //                         ),
+    //                     ),
+    //                 ),
+    //             ),
+    //         );
+    //     }
+    // }
     return $story;
 }
 
