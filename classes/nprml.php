@@ -29,16 +29,63 @@ function nprstory_post_to_nprml_story( $post ) {
         'text' => get_permalink( $post ),
     );
     $use_custom = get_option( 'dp_npr_push_use_custom_map' );
+    
+    $starting_time = strtotime(get_post_meta( $post->ID, 'starting_time', true ));
+
+    /**
+     * Setup program related tags 
+     *    <show>
+     *      <program id="65" code="1A" name="1A" label="1A">1A</program>
+     *      <showDate>Mon, 20 Feb 2017 05:01:02 +0000</showDate>
+     *      <segNum>2</segNum>
+     *    </show>
+     *
+     * <parent type="program" id="65">
+     *   <title>1A</title>
+     *   <link>http://the1a.org</link>
+     * </parent>
+     *
+     */
+
     $program_id = get_option('ds_npr_api_program_id');
     
-    if ( ! empty($program_id )){
+    if ( ! empty($program_id) ){
+        $name = get_bloginfo();
+        
+        // Fetch all segments for show date and get order of each segment
+        $today = date("Ymd", $starting_time);
+        $args = array(
+            'post_type' => 'segment',
+            'post_status' => 'publish',
+            'posts_per_page' => 10,
+            'numberposts' => 10,
+            'meta_query' => array( array(
+                            'key' => 'starting_time',
+                            'value' => $today,
+                            'compare' => '=',
+                            'type' => 'DATE',             
+                ))
+        );        
+        $segments = get_posts($args);
+        usort($segments, "wamu_segment_sort_asc");
+        
+        $show_date = strtotime(get_post_meta( $segments[0]->ID, 'starting_time', true ));
+
+        $segment_number = array_filter(
+            $segments,
+            function ($e) {
+                global $post;
+                return $e->ID == $post->ID;
+            }
+        );
+
         $story[] = array(
             'tag' => 'parent',
             'attr' => array( 'type' => 'program', 'id' => $program_id),
             'children' => array(
                 array(
                     'tag' => 'title',
-                    'text' => get_bloginfo()
+                    'text' => $name
                 ),
                 array(
                     'tag' => 'link',
@@ -46,7 +93,27 @@ function nprstory_post_to_nprml_story( $post ) {
                 )
             )
         );
+
+        $story[] = array(
+            'tag' => 'show',
+            'children' => array(
+                array(
+                    'tag' => 'program',
+                    'attr' => array('id' => $program_id, 'code' => $name,  'name' => $name, 'label' => $name),
+                    'text' => $name
+                ),
+                array(
+                    'tag' => 'showDate',
+                    'text' => gmdate('D, d M Y H:i:s O', $show_date)
+                ),
+                array(
+                    'tag' => 'segNum',
+                    'text' => array_keys($segment_number)[0] + 1
+                )
+            )
+        );
     }
+
 
 
     //get the list of metas available for this post
@@ -202,10 +269,6 @@ function nprstory_post_to_nprml_story( $post ) {
 
     #'miniTeaser' => array( 'text' => '' ),
     #'slug' => array( 'text' => '' ),
-    
-   
-
-    $starting_time = strtotime(get_post_meta( $post->ID, 'starting_time', true ));
 
     $story[] = array(
         'tag' => 'storyDate',
