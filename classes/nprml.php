@@ -78,7 +78,7 @@ function nprstory_post_to_nprml_story( $post ) {
 
         $segment_number = array_filter(
             $segments,
-            function ($e) use($the_post_id){
+            function ($e) use ($the_post_id) {
                 return $e->ID == $the_post_id;
             }
         );
@@ -139,10 +139,20 @@ function nprstory_post_to_nprml_story( $post ) {
         }
     } else {
 */
-        $content = $post->post_content;
+        $content = '';
 
+        if ( function_exists('wamu_get_guest_host') ) {
+
+            $guest_host = wamu_get_guest_host($post->ID);
+            
+            if ( count($guest_host) > 0 ) {
+                $content .= '<p><em>With guest host ' . $guest_host[0]['name'] .'</em>.</p>';
+            }           
+
+        }
+        
         if( function_exists('wamu_markdown_transform')) {
-            $content = wamu_markdown_transform($content);
+            $content .= wamu_markdown_transform($post->post_content);
         }
 
         if ( function_exists('wamu_get_guests') ) {
@@ -160,8 +170,8 @@ function nprstory_post_to_nprml_story( $post ) {
         }
 
         // Add attribution
-        $content .= '<p>&copy; ' . substr(get_post_meta($post->ID, 'starting_time', true), 0, 4 ) . ' WAMU 88.5 - American University Radio. ';
-        $content .= 'For more, see <a href="' . get_permalink( $post ) . '">' . get_permalink( $post ) . '</a>';
+        //$content .= '<p>&copy; ' . substr(get_post_meta($post->ID, 'starting_time', true), 0, 4 ) . ' WAMU 88.5 - American University Radio. ';
+        $content .= '<p>For more, see <a href="' . get_permalink( $post ) . '">' . get_permalink( $post ) . '</a>';
         $content .= '<img src="http://www.google-analytics.com/__utm.gif?utmac=UA-355196-29&utmr='. urlencode(get_option( 'ds_npr_api_push_url' ));
         $content .= '&utmdt=' . urlencode($post->post_title) . '"/>';
         $content .= '</p>';
@@ -326,37 +336,6 @@ function nprstory_post_to_nprml_story( $post ) {
 
     }
 
-    // if ( $enclosures = get_metadata( 'post', $post->ID, 'enclosure' ) ) {
-
-    //     // This logic is specifically driven by enclosure metadata items that are
-    //     // created by the PowerPress podcasting plug-in. It will likely have to be
-    //     // re-worked if we need to accomodate other plug-ins that use enclosures.
-    //     foreach( $enclosures as $enclosure ) {
-    //         $pieces = explode( "\n", $enclosure );
-    //         if ( !empty( $pieces[3] ) ) {
-    //             $metadata = unserialize( $pieces[3] );
-    //             $duration = ( ! empty($metadata['duration'] ) ) ? nprstory_convert_duration_to_seconds( $metadata['duration'] ) : NULL;
-    //         }
-    //         $story[] = array(
-    //             'tag' => 'audio',
-    //             'children' => array(
-    //                 array(
-    //                     'tag' => 'duration',
-    //                     'text' => ( !empty($duration) ) ? $duration : 0,
-    //                 ),
-    //                 array(
-    //                     'tag' => 'format',
-    //                     'children' => array(
-    //                         array(
-    //                         'tag' => 'mp3',
-    //                         'text' => $pieces[0],
-    //                         ),
-    //                     ),
-    //                 ),
-    //             ),
-    //         );
-    //     }
-    // }
     return $story;
 }
 
