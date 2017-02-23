@@ -172,8 +172,8 @@ function nprstory_post_to_nprml_story( $post ) {
         // Add attribution
         //$content .= '<p>&copy; ' . substr(get_post_meta($post->ID, 'starting_time', true), 0, 4 ) . ' WAMU 88.5 - American University Radio. ';
         $content .= '<p>For more, see <a href="' . get_permalink( $post ) . '">' . get_permalink( $post ) . '</a>';
-        $content .= '<img src="http://www.google-analytics.com/__utm.gif?utmac=UA-355196-29&utmr='. urlencode(get_option( 'ds_npr_api_push_url' ));
-        $content .= '&utmdt=' . urlencode($post->post_title) . '"/>';
+        $content .= '<img src="http://www.google-analytics.com/__utm.gif?utmac=UA-355196-30&utmr='. urlencode(get_option( 'ds_npr_api_push_url' ));
+        $content .= '&utmdt=' . urlencode($post->post_title) . '&utme=' . urlencode("8(APIKey)9(MDAxNzk1MDc4MDEyMTU0NTY4ODBlNmE3Yw001)") .'"/>';
         $content .= '</p>';
 
 
@@ -235,7 +235,7 @@ function nprstory_post_to_nprml_story( $post ) {
     );
     $story[] = array(
         'tag' => 'partnerId',
-        'text' => get_permalink($post->ID),
+        'text' => $post->guid,
     );
     //TODO:  When the API accepts sending both text and textWithHTML, send a totally bare text.  Don't do do_shortcode(). 
     //for now (using the npr story api) we can either send text or textWithHTML, not both.
