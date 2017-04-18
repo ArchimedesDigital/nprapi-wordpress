@@ -140,8 +140,6 @@ function nprstory_post_to_nprml_story( $post ) {
      * TO DO:  handle topics
      */
 
-      
-
     $story = array();
     $story[] = array( 
         'tag' => 'link',
@@ -149,6 +147,18 @@ function nprstory_post_to_nprml_story( $post ) {
         'text' => get_permalink( $post ),
     );
     $use_custom = get_option( 'dp_npr_push_use_custom_map' );
+
+    $posttags = get_the_tags();
+    if ($posttags) {
+      foreach($posttags as $tag) {
+        if ( array_key_exists( $tag->name, $topics ) ) {
+            $story[] = array(
+                'tag' => 'parent',
+                'attr' => array( 'type' => 'topic', 'id' => $topics[$tag->name] ),   
+            );         
+        }
+      }
+    }
     
     $starting_time = strtotime(get_post_meta( $post->ID, 'starting_time', true ));
 
@@ -278,7 +288,7 @@ function nprstory_post_to_nprml_story( $post ) {
             $guests = wamu_get_guests($post->ID);
             
             if ( count($guests) > 0 ) {
-                $content .= '<p><h4>Guests</h4></p>';
+                $content .= '<p><h5>Guests</h5></p>';
             }
 
             foreach ( $guests as $guest ) {
@@ -288,10 +298,10 @@ function nprstory_post_to_nprml_story( $post ) {
         }
 
         // Add attribution
-        //$content .= '<p>&copy; ' . substr(get_post_meta($post->ID, 'starting_time', true), 0, 4 ) . ' WAMU 88.5 - American University Radio. ';
+        $content .= '<p>&copy; ' . substr(get_post_meta($post->ID, 'starting_time', true), 0, 4 ) . ' WAMU 88.5 - American University Radio. ';
         $content .= '<p>For more, see <a href="' . get_permalink( $post ) . '">' . get_permalink( $post ) . '</a>';
-        $content .= '<img src="http://www.google-analytics.com/__utm.gif?utmac=UA-355196-30&utmr='. urlencode(get_option( 'ds_npr_api_push_url' ));
-        $content .= '&utmdt=' . urlencode($post->post_title) . '&utme=' . urlencode("8(APIKey)9(MDAxNzk1MDc4MDEyMTU0NTY4ODBlNmE3Yw001)") .'"/>';
+        //$content .= '<img src="http://www.google-analytics.com/__utm.gif?utmac=UA-355196-30&utmr='. urlencode(get_option( 'ds_npr_api_push_url' ));
+        //$content .= '&utmdt=' . urlencode($post->post_title) . '&utme=' . urlencode("8(APIKey)9(MDAxNzk1MDc4MDEyMTU0NTY4ODBlNmE3Yw001)") .'"/>';
         $content .= '</p>';
 
 
