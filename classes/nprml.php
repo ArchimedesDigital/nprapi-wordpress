@@ -25,6 +25,123 @@ function nprstory_to_nprml( $post ) {
  * @param  $post
  */
 function nprstory_post_to_nprml_story( $post ) {
+    $topics = array();
+
+    $topics['Afghanistan'] = 1149;
+    $topics['Africa'] = 1126;
+    $topics['Analysis'] = 1059;
+    $topics['Animals'] = 1132;
+    $topics['Architecture'] = 1142;
+    $topics['Around the Nation '] = 1091;
+    $topics['Art &amp; Life'] = 1008;
+    $topics['Art &amp; Design'] = 1047;
+    $topics['Asia'] = 1125;
+    $topics['Author Interviews'] = 1033;
+    $topics['Book News &amp; Features'] = 1161;
+    $topics['Book Reviews'] = 1034;
+    $topics['Books'] = 1032;
+    $topics['Brain Candy'] = 1130;
+    $topics['Business'] = 1006;
+    $topics['Business Story of the Day'] = 1095;
+    $topics['Children\'s Health'] = 1030;
+    $topics['Columns'] = 1058;
+    $topics['Commentary'] = 1060;
+    $topics['Concerts'] = 1190;
+    $topics['Dance'] = 1145;
+    $topics['Digital Life'] = 1049;
+    $topics['Discover Songs'] = 1108;
+    $topics['Diversions'] = 1051;
+    $topics['Economy'] = 1017;
+    $topics['Education'] = 1013;
+    $topics['Elections'] = 139482413;
+    $topics['Energy'] = 1131;
+    $topics['Environment'] = 1025;
+    $topics['Europe'] = 1124;
+    $topics['Fine Art'] = 1141;
+    $topics['Fitness &amp; Nutrition'] = 1134;
+    $topics['Food'] = 1053;
+    $topics['From Our Listeners'] = 1061;
+    $topics['Games &amp; Humor'] = 1052;
+    $topics['Gardening'] = 1054;
+    $topics['Global Health'] = 1031;
+    $topics['Governing'] = 1123;
+    $topics['Health'] = 1128;
+    $topics['Health Care'] = 1027;
+    $topics['History'] = 1136;
+    $topics['Holiday Story of the Day'] = 1096;
+    $topics['Home Page Top Stories'] = 1002;
+    $topics['House &amp; Senate Races'] = 139545299;
+    $topics['Humans'] = 1129;
+    $topics['Impact'] = 1162;
+    $topics['In Performance'] = 1040;
+    $topics['Interviews'] = 1022;
+    $topics['Iraq'] = 1010;
+    $topics['Israeli-Palestinian Coverage'] = 1101;
+    $topics['Katrina &amp; Beyond'] = 1093;
+    $topics['Latin America'] = 1127;
+    $topics['Law'] = 1070;
+    $topics['Lost &amp; Found Sound'] = 1074;
+    $topics['Low-Wage America'] = 1076;
+    $topics['Media'] = 1020;
+    $topics['Medical Treatments'] = 1135;
+    $topics['Mental Health'] = 1029;
+    $topics['Middle East'] = 1009;
+    $topics['Movie Interviews'] = 1137;
+    $topics['Movie Reviews'] = 4467349;
+    $topics['Movies'] = 1045;
+    $topics['Multimedia'] = 1147;
+    $topics['Music'] = 1039;
+    $topics['Music Interviews'] = 1105;
+    $topics['Music Lists'] = 1107;
+    $topics['Music News'] = 1106;
+    $topics['Music Quizzes'] = 1151;
+    $topics['Music Reviews'] = 1104;
+    $topics['Music Videos'] = 1110;
+    $topics['National Security'] = 1122;
+    $topics['News'] = 1001;
+    $topics['On Aging'] = 1028;
+    $topics['On Disabilities'] = 1133;
+    $topics['Opinion'] = 1057;
+    $topics['Performing Arts'] = 1046;
+    $topics['Photography'] = 1143;
+    $topics['Political Data &amp; Technology'] = 455776378;
+    $topics['Political Demographics'] = 455778960;
+    $topics['Politics'] = 1014;
+    $topics['Politics &amp; Pop Culture'] = 455779148;
+    $topics['Politics: Fact Check'] = 455779263;
+    $topics['Politics: Issues'] = 455779709;
+    $topics['Politics: Member Stations'] = 455779583;
+    $topics['Pop Culture'] = 1048;
+    $topics['Presidential Race'] = 139544303;
+    $topics['Race'] = 1015;
+    $topics['Recipes'] = 1139;
+    $topics['Religion'] = 1016;
+    $topics['Remembrances'] = 1062;
+    $topics['Research News'] = 1024;
+    $topics['Science'] = 1007;
+    $topics['Social Security Debate'] = 1083;
+    $topics['Space'] = 1026;
+    $topics['Sports'] = 1055;
+    $topics['Statewide Races'] = 139545485;
+    $topics['Story of the Day'] = 1090;
+    $topics['Strange News'] = 1146;
+    $topics['Summer'] = 1088;
+    $topics['Technology'] = 1019;
+    $topics['Television'] = 1138;
+    $topics['The Impact of War'] = 1078;
+    $topics['Theater'] = 1144;
+    $topics['U.S.'] = 1003;
+    $topics['World'] = 1004;
+    $topics['World Story of the Day'] = 1056;
+    $topics['Your Health'] = 1066;
+    $topics['Your Money'] = 1018;
+
+    /**
+     * TO DO:  handle topics
+     */
+
+      
+
     $story = array();
     $story[] = array( 
         'tag' => 'link',
@@ -51,6 +168,7 @@ function nprstory_post_to_nprml_story( $post ) {
      */
 
     $program_id = get_option('ds_npr_api_program_id');
+
     
     if ( ! empty($program_id) ){
         $name = get_bloginfo();
