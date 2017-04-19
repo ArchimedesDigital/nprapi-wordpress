@@ -136,10 +136,6 @@ function nprstory_post_to_nprml_story( $post ) {
     $topics['Your Health'] = 1066;
     $topics['Your Money'] = 1018;
 
-    /**
-     * TO DO:  handle topics
-     */
-
     $story = array();
     $story[] = array( 
         'tag' => 'link',
