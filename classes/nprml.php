@@ -296,8 +296,6 @@ function nprstory_post_to_nprml_story( $post ) {
         // Add attribution
         $content .= '<p>&copy; ' . substr(get_post_meta($post->ID, 'starting_time', true), 0, 4 ) . ' WAMU 88.5 - American University Radio. ';
         $content .= '<p>For more, see <a href="' . get_permalink( $post ) . '">' . get_permalink( $post ) . '</a>';
-        //$content .= '<img src="http://www.google-analytics.com/__utm.gif?utmac=UA-355196-30&utmr='. urlencode(get_option( 'ds_npr_api_push_url' ));
-        //$content .= '&utmdt=' . urlencode($post->post_title) . '&utme=' . urlencode("8(APIKey)9(MDAxNzk1MDc4MDEyMTU0NTY4ODBlNmE3Yw001)") .'"/>';
         $content .= '</p>';
 
 
