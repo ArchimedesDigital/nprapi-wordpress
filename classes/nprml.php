@@ -288,7 +288,7 @@ function nprstory_post_to_nprml_story( $post ) {
             }
 
             foreach ( $guests as $guest ) {
-                $content .= '<p><strong>' . $guest['name'] . '</strong>, ' . $guest['credentials'] . '</p>';
+                $content .= '<p><strong>' . $guest['name'] . '</strong>, ' . ucfirst( $guest['credentials'] ) . '</p>';
                 
             }
         }
