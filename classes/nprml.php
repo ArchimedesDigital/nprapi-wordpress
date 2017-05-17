@@ -284,7 +284,7 @@ function nprstory_post_to_nprml_story( $post ) {
             $guests = wamu_get_guests($post->ID);
             
             if ( count($guests) > 0 ) {
-                $content .= '<p><h5>Guests</h5></p>';
+                $content .= '<p><strong>GUESTS</strong></p>';
             }
 
             foreach ( $guests as $guest ) {
@@ -294,10 +294,10 @@ function nprstory_post_to_nprml_story( $post ) {
         }
 
         // Add attribution
-        $content .= '<p>&copy; ' . substr(get_post_meta($post->ID, 'starting_time', true), 0, 4 ) . ' WAMU 88.5 - American University Radio. ';
-        $content .= '<p>For more, see <a href="' . get_permalink( $post ) . '">' . get_permalink( $post ) . '</a>';
-        $content .= '</p>';
 
+        $content .= '<p>For more, visit <strong><a href="' . get_permalink( $post ) . '">' . get_bloginfo( 'name' ) . '</a></strong>';
+        $content .= '.</p>';
+        $content .= '<p>&copy; ' . substr(get_post_meta($post->ID, 'starting_time', true), 0, 4 ) . ' WAMU 88.5 - American University Radio. ';
 
         if ( empty( $teaser_text ) ) {
             $teaser_text = nprstory_nai_get_excerpt( $post );
