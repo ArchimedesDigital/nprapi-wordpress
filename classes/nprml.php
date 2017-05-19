@@ -295,7 +295,7 @@ function nprstory_post_to_nprml_story( $post ) {
 
         // Add attribution
 
-        $content .= '<p>For more, visit <strong><a href="' . get_permalink( $post ) . '">' . get_bloginfo( 'name' ) . '</a></strong>';
+        $content .= '<p>For more, visit <strong><a href="' . get_permalink( $post ) . '">' . get_bloginfo( 'url' ) . '</a></strong>';
         $content .= '.</p>';
         $content .= '<p>&copy; ' . substr(get_post_meta($post->ID, 'starting_time', true), 0, 4 ) . ' WAMU 88.5 - American University Radio. ';
 
